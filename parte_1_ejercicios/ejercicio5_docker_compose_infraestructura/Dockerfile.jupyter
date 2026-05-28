@@ -1,0 +1,19 @@
+FROM python:3.11-slim
+
+RUN pip install --no-cache-dir \
+    jupyter \
+    jupyterlab \
+    pandas==2.1.4 \
+    psycopg2-binary==2.9.9 \
+    sqlalchemy==2.0.25 \
+    matplotlib==3.8.2 \
+    seaborn==0.13.1 \
+    numpy
+
+RUN useradd -m -s /bin/bash jovyan
+WORKDIR /home/jovyan/work
+USER jovyan
+
+EXPOSE 8888
+
+CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--NotebookApp.token=datascience123"]

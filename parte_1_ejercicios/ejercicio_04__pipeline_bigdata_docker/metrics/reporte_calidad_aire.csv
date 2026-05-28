@@ -1,0 +1,13 @@
+ubicacion,hay_personas,co2_promedio,co2_pico
+Bathroom,0,427.14,468
+Bathroom,1,644.53,679
+Bathroom,2,852.57,882
+Bathroom,3,1063.65,1088
+Kitchen,0,431.54,482
+Kitchen,1,590.17,616
+Kitchen,2,737.84,775
+Kitchen,3,883.82,905
+Living_Room,0,516.73,737
+Living_Room,1,718.16,937
+Living_Room,2,842.15,1037
+Living_Room,3,962.1,1137

@@ -1,0 +1,73 @@
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: ds_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: datasciencedb
+      POSTGRES_USER: dsuser
+      POSTGRES_PASSWORD: dspassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - ds_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dsuser -d datasciencedb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyter
+    container_name: ds_jupyter
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: datasciencedb
+      DB_USER: dsuser
+      DB_PASSWORD: dspassword
+    ports:
+      - "8888:8888"
+    volumes:
+      - notebooks_data:/home/jovyan/work
+      - ./notebooks:/home/jovyan/work/notebooks
+      - ./data:/home/jovyan/work/data
+      - ./scripts:/home/jovyan/work/scripts
+    networks:
+      - ds_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ds_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@datascience.local
+      PGADMIN_DEFAULT_PASSWORD: adminpass
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - ds_network
+    depends_on:
+      - postgres
+
+networks:
+  ds_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  notebooks_data:
+  pgadmin_data:
